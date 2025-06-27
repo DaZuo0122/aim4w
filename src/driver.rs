@@ -1,5 +1,6 @@
-use skim_navi::Navi;
-
+// use skim_navi::Navi;
+use dialoguer::{theme::ColorfulTheme, FuzzySelect};
+use futures::executor::block_on;
 use crate::bar::WrappedBar;
 use crate::error::ValidateError;
 use crate::slicer::Slicer;
@@ -192,9 +193,21 @@ impl Driver {
         let schema_handlers = schema_handlers();
         let path = match options.interactive {
             false => "".to_string(),
-            true => Navi::run(input, &schema_handlers[scheme.0].list_handler)
-                .await
-                .unwrap_or("".to_string() + "/"),
+            true => {
+                let list = block_on((schema_handlers[scheme.0].list_handler)(input.to_string()))
+                    .unwrap_or_default();
+
+                if list.is_empty() {
+                    "".to_string()
+                } else {
+                    FuzzySelect::with_theme(&ColorfulTheme::default())
+                        .with_prompt("Select path")
+                        .items(&list)
+                        .interact()
+                        .map(|idx| list[idx].clone())
+                        .unwrap_or_else(|_| "".to_string())
+                }
+            }
         };
 
         if !path.is_empty() {

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use untildify::untildify;
+use crate::untildify::untildify;
 
 pub fn get_possible_ssh_keys_path(silent: bool) -> Vec<String> {
     let mut result: Vec<String> = vec![];

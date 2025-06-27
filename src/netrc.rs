@@ -2,7 +2,7 @@ use netrc::Netrc;
 use std::io::BufReader;
 use std::path::Path;
 
-use untildify::untildify;
+use crate::untildify::untildify;
 
 fn get_possible_netrc_path(silent: bool) -> String {
     let candidates = vec![
